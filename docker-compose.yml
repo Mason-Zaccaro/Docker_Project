@@ -1,0 +1,26 @@
+services:
+  generator:
+    build: ./generator
+    container_name: generator
+    volumes:
+      - ./data.json:/app/data.json  # Монтируем файл data.json в контейнер
+    command: python generator.py
+
+  processor:
+    build: ./processor
+    container_name: processor
+    volumes:
+      - ./data.json:/app/data.json  # Монтируем файл data.json в контейнер
+      - ./processed_data.json:/app/processed_data.json  # Монтируем файл processed_data.json в контейнер
+    depends_on:
+      - generator
+    command: python processor.py
+
+  receiver:
+    build: ./receiver
+    container_name: receiver
+    volumes:
+      - ./processed_data.json:/app/processed_data.json  # Монтируем файл processed_data.json в контейнер
+    depends_on:
+      - processor
+    command: python receiver.py
